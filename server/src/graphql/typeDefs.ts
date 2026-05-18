@@ -94,7 +94,7 @@ export const typeDefs = `#graphql
     applyToGig(gigId: String!, pitch: String!, budget: Float!): Application!
     updateApplicationStatus(applicationId: String!, status: ApplicationStatus!): Application!
     updateMilestoneStatus(milestoneId: String!, status: MilestoneStatus!): Milestone!
-    sendMessage(gigId: String!, content: String!): Message!
+    sendMessage(gigId: String!, content: String!, senderName: String): Message!
   }
 
   type Subscription {

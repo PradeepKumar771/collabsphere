@@ -119,13 +119,20 @@ export const resolvers = {
 
     sendMessage: async (
       _: any,
-      { gigId, content }: { gigId: string; content: string },
+      { gigId, content, senderName }: { gigId: string; content: string; senderName?: string },
       { prisma }: any
     ) => {
-      let sender = await prisma.user.findFirst();
+      const senderNameOrEmail = senderName || 'Default User';
+      let sender = await prisma.user.findFirst({
+        where: { name: senderNameOrEmail },
+      });
       if (!sender) {
         sender = await prisma.user.create({
-          data: { email: 'default@collabsphere.com', name: 'Default User', role: 'USER' },
+          data: {
+            email: `${senderNameOrEmail.toLowerCase().replace(/[^a-z0-9]/g, '')}@collabsphere.com`,
+            name: senderNameOrEmail,
+            role: 'USER',
+          },
         });
       }
 
