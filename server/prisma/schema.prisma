@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String
+  role         UserRole      @default(USER)
+  gigs         Gig[]         @relation("CreatorGigs")
+  applications Application[] @relation("FreelancerApplications")
+  messages     Message[]     @relation("SenderMessages")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Gig {
+  id           String        @id @default(uuid())
+  title        String
+  description  String
+  budget       Float
+  creatorId    String
+  creator      User          @relation("CreatorGigs", fields: [creatorId], references: [id])
+  applications Application[]
+  milestones   Milestone[]
+  messages     Message[]
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+}
+
+model Application {
+  id           String            @id @default(uuid())
+  gigId        String
+  gig          Gig               @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  freelancerId String
+  freelancer   User              @relation("FreelancerApplications", fields: [freelancerId], references: [id])
+  pitch        String
+  budget       Float
+  status       ApplicationStatus @default(PENDING)
+  createdAt    DateTime          @default(now())
+}
+
+model Milestone {
+  id        String          @id @default(uuid())
+  gigId     String
+  gig       Gig             @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  title     String
+  amount    Float
+  status    MilestoneStatus @default(PENDING)
+  createdAt DateTime        @default(now())
+}
+
+model Message {
+  id        String   @id @default(uuid())
+  gigId     String
+  gig       Gig      @relation(fields: [gigId], references: [id], onDelete: Cascade)
+  senderId  String
+  sender    User     @relation("SenderMessages", fields: [senderId], references: [id])
+  content   String
+  createdAt DateTime @default(now())
+}
+
+enum UserRole {
+  ADMIN
+  USER
+  GUEST
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+}
+
+enum MilestoneStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+}

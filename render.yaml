@@ -1,0 +1,35 @@
+# Render Blueprint Configuration for CollabSphere
+# To deploy, go to https://dashboard.render.com/blueprints and connect your repository.
+
+databases:
+  - name: collabsphere-db
+    databaseName: collabsphere
+    user: collabsphere_user
+    plan: free
+
+services:
+  # 1. Backend Web Service (Node.js + Express + Apollo GraphQL + Prisma)
+  - type: web
+    name: collabsphere-backend
+    env: node
+    plan: free
+    buildCommand: npm install && npm run build:server && npm run db:generate --workspace=server
+    startCommand: npm run db:push --workspace=server && npm run start
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: collabsphere-db
+          property: connectionString
+      - key: PORT
+        value: 10000
+
+  # 2. Frontend Static Site (React + Vite + PWA)
+  - type: web
+    name: collabsphere-frontend
+    runtime: static
+    plan: free
+    buildCommand: npm install && npm run build:client
+    staticPublishPath: client/dist
+    envVars:
+      - key: VITE_GRAPHQL_API_URL
+        value: https://collabsphere-backend.onrender.com/graphql # Note: If the backend name is taken, update this with your actual backend subdomain after deployment.
