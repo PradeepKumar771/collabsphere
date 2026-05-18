@@ -59,7 +59,10 @@ const startServer = async () => {
   app.use(
     '/graphql',
     cors<cors.CorsRequest>({
-      origin: true,
+      origin: (origin, callback) => {
+        // Echo back the requesting origin dynamically to support credentials
+        callback(null, true);
+      },
       credentials: true,
     }),
     express.json(),
