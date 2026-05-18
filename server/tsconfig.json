@@ -3,8 +3,8 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "module": "ES2022",
-    "moduleResolution": "bundler"
+    "module": "Node16",
+    "moduleResolution": "node16"
   },
   "ts-node": {
     "compilerOptions": {
