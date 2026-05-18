@@ -90,8 +90,8 @@ export const typeDefs = `#graphql
 
   type Mutation {
     register(email: String!, name: String!): User!
-    createGig(title: String!, description: String!, budget: Float!, milestones: [MilestoneInput!]): Gig!
-    applyToGig(gigId: String!, pitch: String!, budget: Float!): Application!
+    createGig(title: String!, description: String!, budget: Float!, milestones: [MilestoneInput!], creatorName: String): Gig!
+    applyToGig(gigId: String!, pitch: String!, budget: Float!, freelancerName: String): Application!
     updateApplicationStatus(applicationId: String!, status: ApplicationStatus!): Application!
     updateMilestoneStatus(milestoneId: String!, status: MilestoneStatus!): Milestone!
     sendMessage(gigId: String!, content: String!, senderName: String): Message!

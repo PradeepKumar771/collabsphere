@@ -35,8 +35,8 @@ const GET_GIG_DETAILS = gql`
 `;
 
 const APPLY_TO_GIG = gql`
-  mutation ApplyToGig($gigId: String!, $pitch: String!, $budget: Float!) {
-    applyToGig(gigId: $gigId, pitch: $pitch, budget: $budget) {
+  mutation ApplyToGig($gigId: String!, $pitch: String!, $budget: Float!, $freelancerName: String!) {
+    applyToGig(gigId: $gigId, pitch: $pitch, budget: $budget, freelancerName: $freelancerName) {
       id
       pitch
       status
@@ -82,6 +82,14 @@ const GigDetail: React.FC<GigDetailProps> = ({ gigId }) => {
   const [pitchBudget, setPitchBudget] = useState('');
   const [hasApplied, setHasApplied] = useState(false);
   const [localMilestones, setLocalMilestones] = useState<any[]>([]);
+
+  const [username] = useState(() => {
+    const saved = localStorage.getItem('collabsphere_username');
+    if (saved) return saved;
+    const generated = `User-${Math.floor(1000 + Math.random() * 9000)}`;
+    localStorage.setItem('collabsphere_username', generated);
+    return generated;
+  });
 
   // 1. Query all details
   const { data, loading, error, refetch } = useQuery<any>(GET_GIG_DETAILS, {
@@ -140,6 +148,7 @@ const GigDetail: React.FC<GigDetailProps> = ({ gigId }) => {
           gigId,
           pitch: pitchText,
           budget: parseFloat(pitchBudget),
+          freelancerName: username,
         },
       });
     } catch (err) {
@@ -334,7 +343,7 @@ const GigDetail: React.FC<GigDetailProps> = ({ gigId }) => {
                     }}>
                       Status: {app.status}
                     </span>
-                    {app.status === 'PENDING' && (
+                    {app.status === 'PENDING' && gig.creator.name === username && (
                       <div style={{ display: 'flex', gap: '0.4rem' }}>
                         <button
                           onClick={() => updateApplication({ variables: { applicationId: app.id, status: 'ACCEPTED' } })}

@@ -18,8 +18,8 @@ const GET_GIGS = gql`
 `;
 
 const CREATE_GIG = gql`
-  mutation CreateGig($title: String!, $description: String!, $budget: Float!, $milestones: [MilestoneInput!]!) {
-    createGig(title: $title, description: $description, budget: $budget, milestones: $milestones) {
+  mutation CreateGig($title: String!, $description: String!, $budget: Float!, $milestones: [MilestoneInput!]!, $creatorName: String!) {
+    createGig(title: $title, description: $description, budget: $budget, milestones: $milestones, creatorName: $creatorName) {
       id
       title
       description
@@ -36,6 +36,14 @@ const Dashboard: React.FC = () => {
   const [milestoneTitle, setMilestoneTitle] = useState('');
   const [milestoneAmount, setMilestoneAmount] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
+
+  const [username] = useState(() => {
+    const saved = localStorage.getItem('collabsphere_username');
+    if (saved) return saved;
+    const generated = `User-${Math.floor(1000 + Math.random() * 9000)}`;
+    localStorage.setItem('collabsphere_username', generated);
+    return generated;
+  });
 
   // 1. Fetch remote gigs if online
   const { data, loading, refetch } = useQuery<any>(GET_GIGS, {
@@ -93,6 +101,7 @@ const Dashboard: React.FC = () => {
           description: newDesc,
           budget: budgetVal,
           milestones,
+          creatorName: username,
         },
       });
     } catch (err) {

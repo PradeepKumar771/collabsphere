@@ -40,13 +40,20 @@ export const resolvers = {
 
     createGig: async (
       _: any,
-      { title, description, budget, milestones }: { title: string; description: string; budget: number; milestones: Array<{ title: string; amount: number }> },
+      { title, description, budget, milestones, creatorName }: { title: string; description: string; budget: number; milestones: Array<{ title: string; amount: number }>; creatorName?: string },
       { prisma }: any
     ) => {
-      let user = await prisma.user.findFirst();
+      const creatorNameOrEmail = creatorName || 'Creator User';
+      let user = await prisma.user.findFirst({
+        where: { name: creatorNameOrEmail },
+      });
       if (!user) {
         user = await prisma.user.create({
-          data: { email: 'creator@collabsphere.com', name: 'Creator User', role: 'USER' },
+          data: {
+            email: `${creatorNameOrEmail.toLowerCase().replace(/[^a-z0-9]/g, '')}@collabsphere.com`,
+            name: creatorNameOrEmail,
+            role: 'USER',
+          },
         });
       }
 
@@ -69,15 +76,20 @@ export const resolvers = {
 
     applyToGig: async (
       _: any,
-      { gigId, pitch, budget }: { gigId: string; pitch: string; budget: number },
+      { gigId, pitch, budget, freelancerName }: { gigId: string; pitch: string; budget: number; freelancerName?: string },
       { prisma }: any
     ) => {
+      const freelancerNameOrEmail = freelancerName || 'Freelancer Dev';
       let freelancer = await prisma.user.findFirst({
-        where: { email: 'freelancer@collabsphere.com' },
+        where: { name: freelancerNameOrEmail },
       });
       if (!freelancer) {
         freelancer = await prisma.user.create({
-          data: { email: 'freelancer@collabsphere.com', name: 'Freelancer Dev', role: 'USER' },
+          data: {
+            email: `${freelancerNameOrEmail.toLowerCase().replace(/[^a-z0-9]/g, '')}@collabsphere.com`,
+            name: freelancerNameOrEmail,
+            role: 'USER',
+          },
         });
       }
 
